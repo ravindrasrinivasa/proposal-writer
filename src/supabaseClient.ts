@@ -1,8 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
 // We check both VITE_ and NEXT_PUBLIC_ prefixes for robustness across frameworks
-const supabaseUrl = ((import.meta as any).env?.VITE_SUPABASE_URL as string) || ((import.meta as any).env?.NEXT_PUBLIC_SUPABASE_URL as string);
-const supabaseAnonKey = ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY as string) || ((import.meta as any).env?.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
+// @ts-ignore
+const supabaseUrl = (import.meta.env?.VITE_SUPABASE_URL as string) || (import.meta.env?.NEXT_PUBLIC_SUPABASE_URL as string);
+// @ts-ignore
+const supabaseAnonKey = (import.meta.env?.VITE_SUPABASE_ANON_KEY as string) || (import.meta.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
 
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 

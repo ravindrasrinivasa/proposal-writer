@@ -221,6 +221,11 @@ export default function App() {
     serviceRequested: string;
     projectDescription: string;
     tone: ToneType;
+    pricingModel: string;
+    estimatedCost: string;
+    estimatedDuration: string;
+    estimatedEfforts: string;
+    currency: string;
   }) => {
     if (!user) return;
     setErrorBanner(null);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Proposal, ToneType } from "../types";
-import { ArrowLeft, Save, Copy, Check, Eye, Edit2, Sparkles, CheckCircle2, ChevronRight, Download } from "lucide-react";
+import { Proposal, ToneType, parseProposalMetadata } from "../types";
+import { ArrowLeft, Save, Copy, Check, Eye, Edit2, Sparkles, CheckCircle2, ChevronRight, Download, DollarSign, Calendar, Clock } from "lucide-react";
 
 interface ProposalEditorProps {
   proposal: Partial<Proposal>;
@@ -24,7 +24,9 @@ export default function ProposalEditor({ proposal, onBack, onSave, isSaving }: P
   const renderMarkdown = (text: string) => {
     if (!text) return <p className="text-slate-400 italic font-sans">No proposal content generated yet...</p>;
     
-    const lines = text.split("\n");
+    // Prune the YAML metadata block so it doesn't show in the document preview canvas
+    const textToRender = text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+    const lines = textToRender.split("\n");
     return lines.map((line, idx) => {
       // Headers
       if (line.startsWith("# ")) {
@@ -178,6 +180,50 @@ export default function ProposalEditor({ proposal, onBack, onSave, isSaving }: P
           <span>Success! Proposal is saved securely to database schema structures.</span>
         </div>
       )}
+
+      {/* 3-Column Review Cards detailing efforts, duration, cost separately */}
+      {(() => {
+        const meta = parseProposalMetadata(content);
+        return (
+          <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Cost Column */}
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+              <div className="p-2 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg shrink-0">
+                <DollarSign className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">Estimated Cost</span>
+                <span className="block text-sm font-extrabold text-slate-900 truncate mt-0.5">{meta.estimated_cost}</span>
+                <span className="block text-[10px] text-slate-500 font-medium truncate">Model: {meta.pricing_model}</span>
+              </div>
+            </div>
+
+            {/* Duration Column */}
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+              <div className="p-2 bg-blue-100 text-blue-700 border border-blue-200 rounded-lg shrink-0">
+                <Calendar className="h-5 w-5 animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">Project Duration</span>
+                <span className="block text-sm font-extrabold text-slate-900 truncate mt-0.5">{meta.estimated_duration}</span>
+                <span className="block text-[10px] text-slate-500 font-medium truncate">Total timeline limit</span>
+              </div>
+            </div>
+
+            {/* Efforts Column */}
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+              <div className="p-2 bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg shrink-0">
+                <Clock className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">Work Effort</span>
+                <span className="block text-sm font-extrabold text-slate-900 truncate mt-0.5">{meta.estimated_efforts}</span>
+                <span className="block text-[10px] text-slate-500 font-medium truncate">Labor capacity estimate</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Main Splitscreen Body */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

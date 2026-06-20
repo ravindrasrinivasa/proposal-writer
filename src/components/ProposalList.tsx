@@ -1,6 +1,6 @@
 import React from "react";
-import { Proposal } from "../types";
-import { Plus, Clock, FileText, ArrowUpRight, Search, Sparkles, Trash2, Edit3, Eye } from "lucide-react";
+import { Proposal, parseProposalMetadata } from "../types";
+import { Plus, Clock, FileText, ArrowUpRight, Search, Sparkles, Trash2, Edit3, Eye, DollarSign, Calendar } from "lucide-react";
 
 interface ProposalListProps {
   proposals: Proposal[];
@@ -169,6 +169,40 @@ export default function ProposalList({
                     <p className="mt-1 text-xs text-slate-400 font-sans line-clamp-1">
                       {proposal.project_description}
                     </p>
+
+                    {/* Extra Budget & Delivery Criteria displayed separately */}
+                    {(() => {
+                      const meta = parseProposalMetadata(proposal.proposal_content);
+                      if (meta.estimated_cost === "Not specified" && meta.estimated_duration === "Not specified" && meta.estimated_efforts === "Not specified") {
+                        return null;
+                      }
+                      return (
+                        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                          {meta.estimated_cost !== "Not specified" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-50 border border-slate-200/60 rounded-lg text-xs font-semibold text-slate-700">
+                              <DollarSign className="h-3 w-3 text-emerald-600 shrink-0" />
+                              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cost:</span>
+                              <span className="text-slate-900">{meta.estimated_cost}</span>
+                              <span className="text-[10px] text-slate-500 font-normal">({meta.pricing_model})</span>
+                            </span>
+                          )}
+                          {meta.estimated_duration !== "Not specified" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-50 border border-slate-200/60 rounded-lg text-xs font-semibold text-slate-700">
+                              <Calendar className="h-3 w-3 text-blue-600 shrink-0" />
+                              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Duration:</span>
+                              <span className="text-slate-900">{meta.estimated_duration}</span>
+                            </span>
+                          )}
+                          {meta.estimated_efforts !== "Not specified" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-50 border border-slate-200/60 rounded-lg text-xs font-semibold text-slate-700">
+                              <Clock className="h-3 w-3 text-indigo-600 shrink-0" />
+                              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Efforts:</span>
+                              <span className="text-slate-900">{meta.estimated_efforts}</span>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Metadata Dates */}
                     <div className="mt-2.5 flex items-center gap-4 text-xs text-slate-400 font-medium font-mono">
