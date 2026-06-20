@@ -1,0 +1,6 @@
+{
+  "name": "Proposal Generator",
+  "description": "An AI-powered proposal generator for small agency founders to instantly generate, edit, and save client proposals with native Supabase integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
