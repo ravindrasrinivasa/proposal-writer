@@ -94,6 +94,7 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
+  const [sqlCopied, setSqlCopied] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Authenticate & Load User on Boot
@@ -161,10 +162,6 @@ export default function App() {
             .order("created_at", { ascending: false });
 
           if (error) {
-            // If table doesn't exist yet but user wants to use a database, show helper
-            if (error.code === "PGRST116" || error.message.includes("does not exist")) {
-              setErrorBanner("Wait! Your database tables are missing. Please execute the SQL code in 'supabase_schema.sql' inside your Supabase project's SQL editor.");
-            }
             throw error;
           }
           if (data) {
@@ -172,7 +169,21 @@ export default function App() {
           }
         } catch (err: any) {
           console.error("Database query failed:", err);
-          setErrorBanner("Failed to retrieve credentials from Supabase: " + (err.message || err));
+          const msg = err.message || JSON.stringify(err);
+          if (
+            msg.includes("proposals") || 
+            msg.includes("schema cache") || 
+            msg.includes("does not exist") || 
+            err.code === "PGRST116" ||
+            err.code === "42P01"
+          ) {
+            setErrorBanner(
+              "SUPABASE_SCHEMA_MISSING: Your 'proposals' database table was not found in your Supabase schema cache. " +
+              "To resolve this, please execute the SQL queries defined in 'supabase_schema.sql' inside your Supabase project's SQL Editor."
+            );
+          } else {
+            setErrorBanner("Failed to retrieve credentials from Supabase: " + msg);
+          }
         }
       } else {
         // Demo storage
@@ -238,7 +249,14 @@ export default function App() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data: any;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const textResponse = await response.text();
+        throw new Error(`Server returned a non-JSON response (Status ${response.status}). If the server had a boot failure or was restarting, please wait a moment and try again. Details: ${textResponse.slice(0, 150)}...`);
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "An error occurred during Gemini compilation on the server-side.");
