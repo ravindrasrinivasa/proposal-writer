@@ -98,9 +98,23 @@ export default function App() {
 
   // Authenticate & Load User on Boot
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
     async function checkUserOnStartup() {
       if (isSupabaseConfigured && supabase) {
         try {
+          const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email || "",
+              });
+            } else {
+              setUser(null);
+            }
+          });
+          unsubscribe = subscription?.unsubscribe;
+
           const { data } = await supabase.auth.getUser();
           if (data?.user) {
             setUser({
@@ -125,6 +139,10 @@ export default function App() {
       setIsInitialized(true);
     }
     checkUserOnStartup();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   // Fetch proposals once authenticated

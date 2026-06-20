@@ -219,6 +219,21 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
               {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up free"}
             </button>
           </div>
+
+          {isSupabaseConfigured && (
+            <div className="mt-6 border-t border-slate-100 pt-5 text-[11px] text-slate-400 space-y-2 leading-relaxed font-sans">
+              <span className="font-bold text-slate-500 uppercase tracking-wider block mb-1.5 font-mono">🔌 Supabase Integration Guide</span>
+              <p>
+                1. <strong className="text-slate-600">Register first</strong>: Standard databases begin with zero users. If you have not created your account yet, click <strong className="text-slate-600">"Sign Up free"</strong> above.
+              </p>
+              <p>
+                2. <strong className="text-slate-600">Confirm Email Setting</strong>: Supabase requires email confirmation by default. To disable this and log in instantly, toggle off <strong className="text-slate-600">Confirm email</strong> under <code className="bg-slate-50 px-1 py-0.5 rounded border border-slate-150 font-mono text-[10px] text-slate-500">Authentication &gt; Providers &gt; Email &gt; Confirm email</code> in your Supabase dashboard.
+              </p>
+              <p>
+                3. <strong className="text-slate-600">Prerequisite SQL tables</strong>: After you log in successfully, ensure you execute the DDL queries in your <code className="bg-slate-50 px-1 py-0.5 rounded border border-slate-150 font-mono text-[10px] text-slate-500">supabase_schema.sql</code> inside the Supabase SQL editor to enable database transactions.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
