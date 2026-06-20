@@ -9,6 +9,11 @@ export interface Proposal {
   tone: ToneType;
   proposal_content: string;
   status: "draft" | "sent" | "approved";
+  pricing_model?: string;
+  estimated_cost?: string;
+  estimated_duration?: string;
+  estimated_efforts?: string;
+  currency?: string;
   created_at: string;
   updated_at: string;
 }
@@ -26,14 +31,24 @@ export interface ProposalMetadata {
   currency: string;
 }
 
-export function parseProposalMetadata(content?: string): ProposalMetadata {
+export function parseProposalMetadata(content?: string, proposal?: Partial<Proposal>): ProposalMetadata {
   const result: ProposalMetadata = {
-    pricing_model: "Fixed Price",
-    estimated_cost: "Not specified",
-    estimated_duration: "Not specified",
-    estimated_efforts: "Not specified",
-    currency: "$",
+    pricing_model: proposal?.pricing_model || "Fixed Price",
+    estimated_cost: proposal?.estimated_cost || "Not specified",
+    estimated_duration: proposal?.estimated_duration || "Not specified",
+    estimated_efforts: proposal?.estimated_efforts || "Not specified",
+    currency: proposal?.currency || "$",
   };
+
+  // If we already have explicit values from the db/object, return them
+  if (
+    proposal?.pricing_model ||
+    (proposal?.estimated_cost && proposal.estimated_cost !== "Not specified") ||
+    (proposal?.estimated_duration && proposal.estimated_duration !== "Not specified") ||
+    (proposal?.estimated_efforts && proposal.estimated_efforts !== "Not specified")
+  ) {
+    return result;
+  }
 
   if (!content) return result;
 

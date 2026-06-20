@@ -172,7 +172,7 @@ export default function ProposalList({
 
                     {/* Extra Budget & Delivery Criteria displayed separately */}
                     {(() => {
-                      const meta = parseProposalMetadata(proposal.proposal_content);
+                      const meta = parseProposalMetadata(proposal.proposal_content, proposal);
                       if (meta.estimated_cost === "Not specified" && meta.estimated_duration === "Not specified" && meta.estimated_efforts === "Not specified") {
                         return null;
                       }

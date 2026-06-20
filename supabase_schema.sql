@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS public.proposals (
     tone TEXT NOT NULL CHECK (tone IN ('Professional', 'Friendly', 'Premium', 'Enterprise')),
     proposal_content TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'approved')),
+    pricing_model TEXT DEFAULT 'Fixed Price',
+    estimated_cost TEXT DEFAULT 'Not specified',
+    estimated_duration TEXT DEFAULT 'Not specified',
+    estimated_efforts TEXT DEFAULT 'Not specified',
+    currency TEXT DEFAULT '$',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

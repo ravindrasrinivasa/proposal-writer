@@ -3,7 +3,7 @@ import AuthScreen from "./components/AuthScreen";
 import ProposalList from "./components/ProposalList";
 import ProposalForm from "./components/ProposalForm";
 import ProposalEditor from "./components/ProposalEditor";
-import { Proposal, UserProfile, ToneType } from "./types";
+import { Proposal, UserProfile, ToneType, parseProposalMetadata } from "./types";
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
 import { FileText, LogOut, Sparkles, AlertTriangle, CheckCircle, Database, HelpCircle, LayoutGrid } from "lucide-react";
 
@@ -245,6 +245,7 @@ export default function App() {
       }
 
       const generatedContent = data.proposalContent;
+      const meta = parseProposalMetadata(generatedContent);
 
       const newProposalDraft: Partial<Proposal> = {
         client_name: formData.clientName,
@@ -253,6 +254,11 @@ export default function App() {
         tone: formData.tone,
         proposal_content: generatedContent,
         status: "draft",
+        pricing_model: meta.pricing_model,
+        estimated_cost: meta.estimated_cost,
+        estimated_duration: meta.estimated_duration,
+        estimated_efforts: meta.estimated_efforts,
+        currency: meta.currency,
       };
 
       setSelectedProposal(newProposalDraft);
@@ -272,6 +278,12 @@ export default function App() {
     setIsSaving(true);
 
     const now = new Date().toISOString();
+    const meta = parseProposalMetadata(updatedFields.proposal_content || "");
+    const pricing_model = updatedFields.pricing_model || meta.pricing_model;
+    const estimated_cost = updatedFields.estimated_cost || meta.estimated_cost;
+    const estimated_duration = updatedFields.estimated_duration || meta.estimated_duration;
+    const estimated_efforts = updatedFields.estimated_efforts || meta.estimated_efforts;
+    const currency = updatedFields.currency || meta.currency;
 
     try {
       if (isSupabaseConfigured && supabase) {
@@ -286,6 +298,11 @@ export default function App() {
               tone: updatedFields.tone,
               proposal_content: updatedFields.proposal_content,
               status: updatedFields.status,
+              pricing_model,
+              estimated_cost,
+              estimated_duration,
+              estimated_efforts,
+              currency,
               updated_at: now,
             })
             .eq("id", updatedFields.id)
@@ -311,6 +328,11 @@ export default function App() {
               tone: updatedFields.tone,
               proposal_content: updatedFields.proposal_content,
               status: updatedFields.status || "draft",
+              pricing_model,
+              estimated_cost,
+              estimated_duration,
+              estimated_efforts,
+              currency,
               created_at: now,
               updated_at: now,
             })
@@ -331,7 +353,7 @@ export default function App() {
         if (updatedFields.id) {
           nextProposalsList = nextProposalsList.map(p => {
             if (p.id === updatedFields.id) {
-              const updated = {
+              const updated: Proposal = {
                 ...p,
                 client_name: updatedFields.client_name!,
                 service_requested: updatedFields.service_requested!,
@@ -339,6 +361,11 @@ export default function App() {
                 tone: updatedFields.tone!,
                 proposal_content: updatedFields.proposal_content!,
                 status: updatedFields.status!,
+                pricing_model,
+                estimated_cost,
+                estimated_duration,
+                estimated_efforts,
+                currency,
                 updated_at: now,
               };
               savedProposal = updated;
@@ -357,6 +384,11 @@ export default function App() {
             tone: updatedFields.tone || "Professional",
             proposal_content: updatedFields.proposal_content || "",
             status: updatedFields.status || "draft",
+            pricing_model,
+            estimated_cost,
+            estimated_duration,
+            estimated_efforts,
+            currency,
             created_at: now,
             updated_at: now,
           };

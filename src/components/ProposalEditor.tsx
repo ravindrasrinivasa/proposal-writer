@@ -183,7 +183,7 @@ export default function ProposalEditor({ proposal, onBack, onSave, isSaving }: P
 
       {/* 3-Column Review Cards detailing efforts, duration, cost separately */}
       {(() => {
-        const meta = parseProposalMetadata(content);
+        const meta = parseProposalMetadata(content, proposal);
         return (
           <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Cost Column */}
